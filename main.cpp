@@ -1,10 +1,10 @@
 /**
- * 1. Applying pointers concepts
+ * 1. Applying \pointers concepts
  * 2. Applying \function concepts
- * 3. Applying file \io concepts
+ * 3. Applying file \i o concepts
  * 4. Applying \1-d and 2-d array concepts
  * 5. Applying \text files concepts
- * 6. Integrating pointers, \function, \arrays and \text files in the system
+ * 6. Integrating \pointers, \function, \arrays and \text files in the system
  * 7. Interactivity
  * 8. Calculation
  * 9. Exception handling
@@ -69,8 +69,8 @@ int readEmployeeData(Employee employee[])
     return index;
 }
 
-void printEmployeeData(const Employee (&employee)[MAX_EMPLOYEE]){
-    for(int i =0; i<100; i++){
+void printEmployeeData(const Employee (&employee)[MAX_EMPLOYEE], int lastIndex){
+    for(int i =0; i<lastIndex; i++){
         if(employee[i].name != "")
         {
             cout<<employee[i].id<<", ";
@@ -87,6 +87,21 @@ void printEmployeeData(const Employee (&employee)[MAX_EMPLOYEE]){
     }
 }
 
+void addEmployee(Employee& employee, int* lastIndex)
+{
+    //ADD ERROR HANDLING HERE
+    employee.id = *lastIndex;
+    getline(cin, employee.name);
+    getline(cin, employee.designation);
+    cin>>employee.hourlyRate;
+    cin>>employee.hoursWorked;
+    cin>>employee.overtimeHours;
+    cin>>employee.allowance;
+    cin>>employee.deduction;
+
+    *lastIndex +=1;
+}
+
 int main(){
     //declare employee struct variable
     Employee employees[MAX_EMPLOYEE];
@@ -97,7 +112,15 @@ int main(){
     lastIndex = readEmployeeData(employees);
 
     //display all the employee data
-    printEmployeeData(employees);
+    printEmployeeData(employees, lastIndex);
 
+    //add an employee
+    Employee* addEmp = &employees[lastIndex];
+
+    addEmployee(*addEmp, &lastIndex);
+
+    printEmployeeData(employees, lastIndex);
+
+    cout<<lastIndex;
 
 }
