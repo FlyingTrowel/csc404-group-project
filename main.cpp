@@ -17,6 +17,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <limits>
 
 using namespace std;
 
@@ -79,23 +80,69 @@ void printEmployeeData(Employee employee[], int lastIndex){
     }
 }
 
-void addEmployee(Employee& employee, int* lastIndex)
-{
-    //TODO: ADD ERROR HANDLING HERE
-    cin>>employee.id;
-    cin.ignore();
-    getline(cin, employee.name);
-    getline(cin, employee.designation);
-    cin>>employee.hourlyRate;
-    cin>>employee.hoursWorked;
-    cin>>employee.overtimeHours;
-    cin>>employee.allowance;
-    cin>>employee.deduction;
+void addEmployee(Employee& employee, int* lastIndex) {
+    bool validInput = false;
 
-    *lastIndex +=1;
+    while (!validInput) {
+        // Prompt for employee details
+        cout << "Enter the employee details:" << endl;
+        try {
+            cout << "ID: ";
+            cin >> employee.id;
+            if (!cin) {
+                throw runtime_error("Invalid input. ID must be an integer.");
+            }
+
+            cin.ignore();  // Ignore the newline character left in the input buffer
+
+            cout << "Name: ";
+            getline(cin, employee.name);
+
+            cout << "Designation: ";
+            getline(cin, employee.designation);
+
+            cout << "Hourly Rate: ";
+            cin >> employee.hourlyRate;
+            if (!cin) {
+                throw runtime_error("Invalid input. Hourly rate must be a number.");
+            }
+
+            cout << "Hours Worked: ";
+            cin >> employee.hoursWorked;
+            if (!cin) {
+                throw runtime_error("Invalid input. Hours worked must be an integer.");
+            }
+
+            cout << "Overtime Hours: ";
+            cin >> employee.overtimeHours;
+            if (!cin) {
+                throw runtime_error("Invalid input. Overtime hours must be an integer.");
+            }
+
+            cout << "Allowance: ";
+            cin >> employee.allowance;
+            if (!cin) {
+                throw runtime_error("Invalid input. Allowance must be a number.");
+            }
+
+            cout << "Deduction: ";
+            cin >> employee.deduction;
+            if (!cin) {
+                throw runtime_error("Invalid input. Deduction must be a number.");
+            }
+
+            validInput = true;
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+
+    *lastIndex += 1;
 }
 
-void addEmployeeData(Employee employee[], int lastIndex)
+void addEmployeeToFile(Employee employee[], int lastIndex)
 {
     ofstream file("D:\\Github\\Learn\\404\\csc404-group-project\\files\\employee.txt");
 
@@ -114,9 +161,119 @@ void addEmployeeData(Employee employee[], int lastIndex)
     file.close();
 }
 
-void removeEmployee(Employee (&employee)[MAX_EMPLOYEE], int lastIndex)
-{
+void removeEmployee(Employee employee[], int& lastIndex) {
+    // Print the employee data
     printEmployeeData(employee, lastIndex);
+
+    // Prompt for employee ID to remove
+    int idToRemove;
+    cout << "Enter the ID of the employee to remove: ";
+    cin >> idToRemove;
+
+    bool employeeFound = false;
+
+    // Find the employee with the matching ID
+    for (int i = 0; i < lastIndex; i++) {
+        if (employee[i].id == idToRemove) {
+            // Shift elements to remove the employee
+            for (int j = i; j < lastIndex - 1; j++) {
+                employee[j] = employee[j + 1];
+            }
+
+            lastIndex--;
+            employeeFound = true;
+            break;
+        }
+    }
+
+    // Check if employee was found and removed
+    if (employeeFound) {
+        cout << "Employee with ID " << idToRemove << " has been removed." << endl;
+        // Update the employee file
+        addEmployeeToFile(employee, lastIndex);
+    } else {
+        cout << "Employee with ID " << idToRemove << " not found." << endl;
+    }
+}
+
+void editEmployee(Employee employee[], int lastIndex) {
+    // Print the employee data
+    printEmployeeData(employee, lastIndex);
+
+    // Prompt for employee ID to edit
+    int idToEdit;
+    cout << "Enter the ID of the employee to edit: ";
+    cin >> idToEdit;
+
+    bool employeeFound = false;
+    int fieldToEdit;
+
+    // Find the employee with the matching ID
+    for (int i = 0; i < lastIndex; i++) {
+        if (employee[i].id == idToEdit) {
+            employeeFound = true;
+
+            // Prompt for the field to edit
+            cout << "Select the field to edit:" << endl;
+            cout << "1. Name" << endl;
+            cout << "2. Designation" << endl;
+            cout << "3. Hourly Rate" << endl;
+            cout << "4. Hours Worked" << endl;
+            cout << "5. Overtime Hours" << endl;
+            cout << "6. Allowance" << endl;
+            cout << "7. Deduction" << endl;
+            cout << "Enter your choice: ";
+            cin >> fieldToEdit;
+
+            // Edit the chosen field
+            switch (fieldToEdit) {
+                case 1:
+                    cin.ignore();
+                    cout << "Enter the new name: ";
+                    getline(cin, employee[i].name);
+                    break;
+                case 2:
+                    cin.ignore();
+                    cout << "Enter the new designation: ";
+                    getline(cin, employee[i].designation);
+                    break;
+                case 3:
+                    cout << "Enter the new hourly rate: ";
+                    cin >> employee[i].hourlyRate;
+                    break;
+                case 4:
+                    cout << "Enter the new hours worked: ";
+                    cin >> employee[i].hoursWorked;
+                    break;
+                case 5:
+                    cout << "Enter the new overtime hours: ";
+                    cin >> employee[i].overtimeHours;
+                    break;
+                case 6:
+                    cout << "Enter the new allowance: ";
+                    cin >> employee[i].allowance;
+                    break;
+                case 7:
+                    cout << "Enter the new deduction: ";
+                    cin >> employee[i].deduction;
+                    break;
+                default:
+                    cout << "Invalid choice. No field updated." << endl;
+                    break;
+            }
+
+            break;
+        }
+    }
+
+    // Check if employee was found and edited
+    if (employeeFound) {
+        cout << "Employee with ID " << idToEdit << " has been edited." << endl;
+        // Update the employee file
+        addEmployeeToFile(employee, lastIndex);
+    } else {
+        cout << "Employee with ID " << idToEdit << " not found." << endl;
+    }
 }
 
 void calculateMonthlySalary(Employee employee[], double salary[][5], int lastIndex) {
@@ -150,11 +307,6 @@ void calculateMonthlySalary(Employee employee[], double salary[][5], int lastInd
 
 }
 
-void payroll(int lastIndex, Employee employee[]){
-
-
-
-}
 
 int main(){
     //declare employee struct variable
@@ -180,7 +332,7 @@ int main(){
             //display all the employee data
             printEmployeeData(employees, lastIndex);
         }
-        //add employee to txt
+        //insert new employee details and update the file
         else if(userInput == 2)
         {
             //add an employee
@@ -188,15 +340,20 @@ int main(){
             addEmployee(*addEmp, &lastIndex);
             cout<<lastIndex;
             printEmployeeData(employees, lastIndex);
-            addEmployeeData(employees, lastIndex);
+            addEmployeeToFile(employees, lastIndex);
         }
         //remove employee
         else if(userInput == 3)
         {
             removeEmployee(employees, lastIndex);
         }
-        // Calculate monthly salary for each employee
+        //edit employee
         else if(userInput == 4)
+        {
+            editEmployee(employees, lastIndex);
+        }
+        // Calculate monthly salary for each employee
+        else if(userInput == 5)
         {
             double salary[MAX_EMPLOYEE][5];
             calculateMonthlySalary(employees, salary, lastIndex);
