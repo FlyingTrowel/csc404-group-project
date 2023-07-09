@@ -1,6 +1,6 @@
 Monthly Salary
 Employee ID Name                        Regular Pay        Overtime Pay           Total Pay     Average Pay Rate
-1           Joe Smith                        4800.00              450.00             5550.00               32.65
+1           John Smith                       5600.00              525.00             6425.00               37.79
 2           Jane Johnson                     2800.00              150.00             3100.00               21.38
 3           David Davis                      1800.00                0.00             1900.00               15.83
 4           Sarah Brown                      4000.00              750.00             4900.00               27.22

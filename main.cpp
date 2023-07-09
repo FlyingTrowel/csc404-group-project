@@ -74,11 +74,24 @@ int readEmployeeData(Employee employee[])
     return index;
 }
 
-void printEmployeeData(Employee employee[], int lastIndex){
-    for(int i = 0; i<lastIndex; i++) {
-        cout << employee[i].id << ", "<<employee[i].name<<", "<<employee[i].designation<<", "<<employee[i].hourlyRate<<", "<<employee[i].hoursWorked<<", "<<employee[i].overtimeHours<<", "<<employee[i].allowance<<", "<<employee[i].deduction<<endl;
+void printEmployeeData(Employee employee[], int lastIndex) {
+    cout << "-----------------------------------------------------------------------------------------------------" << endl;
+    cout << left << setw(6) << "ID" << " | " << setw(20) << "Name" << " | " << setw(12) << "Designation" <<" | "<< setw(11) << "Hourly Rate" << " | " << setw(13) << "Hours Worked" << " | " << setw(10) << "Allowance" << " | " << setw(9) << "Deduction" << endl;
+    cout << "-----------------------------------------------------------------------------------------------------" << endl;
+
+    for (int i = 0; i < lastIndex; i++) {
+        cout << left << setw(6) << employee[i].id << " | "
+             << setw(20) << employee[i].name << " | "
+             << setw(12) << employee[i].designation << " | "
+             << right << setw(11) << fixed << setprecision(2) << employee[i].hourlyRate << " | "
+             << setw(13) << employee[i].hoursWorked << " | "
+             << setw(10) << fixed << setprecision(2) << employee[i].allowance << " | "
+             << setw(9) << fixed << setprecision(2) << employee[i].deduction << endl;
     }
+
+    cout << "-----------------------------------------------------------------------------------------------------" << endl;
 }
+
 
 void addEmployee(Employee& employee, int* lastIndex) {
     bool validInput = false;
