@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_csc404_group_project: phony || CMakeFile
 
 build CMakeFiles/csc404_group_project.dir/main.cpp.obj: CXX_COMPILER__csc404_group_project_Debug D$:/Github/Learn/404/csc404-group-project/main.cpp || cmake_object_order_depends_target_csc404_group_project
   DEP_FILE = CMakeFiles\csc404_group_project.dir\main.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -fdiagnostics-color=always -std=gnu++11
   OBJECT_DIR = CMakeFiles\csc404_group_project.dir
   OBJECT_FILE_DIR = CMakeFiles\csc404_group_project.dir
 

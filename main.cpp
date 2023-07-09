@@ -1,13 +1,16 @@
 /**
- * 1. Applying \pointers concepts
- * 2. Applying \function concepts
- * 3. Applying file \i o concepts
- * 4. Applying \1-d and 2-d array concepts
- * 5. Applying \text files concepts
- * 6. Integrating \pointers, \function, \arrays and \text files in the system
- * 7. Interactivity
- * 8. Calculation
- * 9. Exception handling
+ * c++11 minimum
+ * TODO: 1. Applying \pointers concepts
+ * TODO: 2. Applying \function concepts
+ * TODO: 3. Applying file \i \o concepts
+ * TODO: 4. Applying \1-d and 2-d array concepts
+ * TODO: 5. Applying \text files concepts
+ * TODO: 6. Integrating \pointers, \function, \arrays and \text files in the system
+ * TODO: 7. Interactivity
+ * TODO: 8. Calculation
+ * TODO: 9. Exception handling
+ *
+ * TODO: https://stackoverflow.com/questions/49775560/how-to-create-standalone-exe-in-clion
  */
 
 #include <iostream>
@@ -69,28 +72,17 @@ int readEmployeeData(Employee employee[])
     return index;
 }
 
-void printEmployeeData(const Employee (&employee)[MAX_EMPLOYEE], int lastIndex){
-    for(int i =0; i<lastIndex; i++){
-        if(employee[i].name != "")
-        {
-            cout<<employee[i].id<<", ";
-            cout<<employee[i].name<<", ";
-            cout<<employee[i].designation<<", ";
-            cout<<employee[i].hourlyRate<<", ";
-            cout<<employee[i].hoursWorked<<", ";
-            cout<<employee[i].overtimeHours<<", ";
-            cout<<employee[i].allowance<<", ";
-            cout<<employee[i].deduction<<endl;
-        }
-        else
-            break;
+void printEmployeeData(Employee employee[], int lastIndex){
+    for(int i = 0; i<lastIndex; i++) {
+        cout << employee[i].id << ", "<<employee[i].name<<", "<<employee[i].designation<<", "<<employee[i].hourlyRate<<", "<<employee[i].hoursWorked<<", "<<employee[i].overtimeHours<<", "<<employee[i].allowance<<", "<<employee[i].deduction<<endl;
     }
 }
 
 void addEmployee(Employee& employee, int* lastIndex)
 {
-    //ADD ERROR HANDLING HERE
-    employee.id = *lastIndex;
+    //TODO: ADD ERROR HANDLING HERE
+    cin>>employee.id;
+    cin.ignore();
     getline(cin, employee.name);
     getline(cin, employee.designation);
     cin>>employee.hourlyRate;
@@ -102,25 +94,89 @@ void addEmployee(Employee& employee, int* lastIndex)
     *lastIndex +=1;
 }
 
+void addEmployeeData(Employee employee[], int lastIndex)
+{
+    ofstream file("D:\\Github\\Learn\\404\\csc404-group-project\\files\\employee.txt");
+
+    for(int i = 0; i< lastIndex; i++)
+    {
+        file<<employee[i].id<<",";
+        file<<employee[i].name<<",";
+        file<<employee[i].designation<<",";
+        file<<employee[i].hourlyRate<<",";
+        file<<employee[i].hoursWorked<<",";
+        file<<employee[i].overtimeHours<<",";
+        file<<employee[i].allowance<<",";
+        file<<employee[i].deduction<<endl;
+    }
+
+    file.close();
+}
+
+void removeEmployee(Employee (&employee)[MAX_EMPLOYEE], int lastIndex)
+{
+    printEmployeeData(employee, lastIndex);
+}
+
+void payroll(){
+
+}
+
 int main(){
     //declare employee struct variable
     Employee employees[MAX_EMPLOYEE];
 
     int lastIndex = -1;
+    int userInput = 0;
 
     //store data from employee.txt to employees array
     lastIndex = readEmployeeData(employees);
 
-    //display all the employee data
-    printEmployeeData(employees, lastIndex);
+    while(userInput != -1){
+        //TODO: add try catch
+        cout<<"Choose what you want to do\n";
+        cin>>userInput;
 
-    //add an employee
-    Employee* addEmp = &employees[lastIndex];
+        //print employee data
+        if(userInput == 1)
+        {
+            //display all the employee data
+            printEmployeeData(employees, lastIndex);
+        }
+        //add employee to txt
+        else if(userInput == 2)
+        {
+            //add an employee
+            Employee* addEmp = &employees[lastIndex];
+            addEmployee(*addEmp, &lastIndex);
+            cout<<lastIndex;
+            printEmployeeData(employees, lastIndex);
+            addEmployeeData(employees, lastIndex);
+        }
+        //remove employee
+        else if(userInput == 3)
+        {
+            removeEmployee(employees, lastIndex);
+        }
+        //calculate gross pay and output to payroll
+        else if(userInput == 4)
+        {
 
-    addEmployee(*addEmp, &lastIndex);
+        }
+        //exit
+        else if(userInput == -1)
+        {
+            break;
+        }
+        //wrong input number
+        else
+        {
+            cout<<"Invalid input: "<<userInput;
+        }
 
-    printEmployeeData(employees, lastIndex);
 
-    cout<<lastIndex;
+    }
 
+    cout<<"System is shutting down...";
+    return 0;
 }
