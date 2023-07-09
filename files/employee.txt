@@ -13,4 +13,3 @@
 13,Lucas Hall,Designer,25,150,5,300,150
 14,Chloe Lopez,Engineer,28,160,0,400,200
 15,Henry Green,Manager,30,160,10,500,200
-123,AIEMAN,CEO,100,100,100,100,100

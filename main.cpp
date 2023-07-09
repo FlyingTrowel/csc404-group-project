@@ -3,11 +3,11 @@
  * TODO: 1. Applying \pointers concepts
  * TODO: 2. Applying \function concepts
  * TODO: 3. Applying file \i \o concepts
- * TODO: 4. Applying \1-d and 2-d array concepts
+ * TODO: 4. Applying \1-d and \2-d array concepts
  * TODO: 5. Applying \text files concepts
  * TODO: 6. Integrating \pointers, \function, \arrays and \text files in the system
  * TODO: 7. Interactivity
- * TODO: 8. Calculation
+ * TODO: 8. \Calculation
  * TODO: 9. Exception handling
  *
  * TODO: https://stackoverflow.com/questions/49775560/how-to-create-standalone-exe-in-clion
@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -118,7 +119,40 @@ void removeEmployee(Employee (&employee)[MAX_EMPLOYEE], int lastIndex)
     printEmployeeData(employee, lastIndex);
 }
 
-void payroll(){
+void calculateMonthlySalary(Employee employee[], double salary[][5], int lastIndex) {
+    ofstream file("D:\\Github\\Learn\\404\\csc404-group-project\\files\\payroll.txt");
+
+    for (int i = 0; i < lastIndex; i++) {
+        double regularPay = employee[i].hourlyRate * employee[i].hoursWorked;
+        double overtimePay = employee[i].hourlyRate * 1.5 * employee[i].overtimeHours;
+        double totalPay = regularPay + overtimePay + employee[i].allowance - employee[i].deduction;
+
+        salary[i][0] = employee[i].id;
+        salary[i][1] = regularPay;
+        salary[i][2] = overtimePay;
+        salary[i][3] = totalPay;
+        salary[i][4] = totalPay / (employee[i].hoursWorked + employee[i].overtimeHours);
+    }
+
+    file<<"Monthly Salary"<<endl;
+    file<<left<<setw(11)<<"Employee ID "<<setw(20)<<"Name"<<right<<setw(20)<<"Regular Pay "<<setw(20)<<"Overtime Pay "<<setw(20)<<"Total Pay "<<setw(20)<<"Average Pay Rate"<< endl;
+    for(int i = 0; i<lastIndex; i++)
+    {
+        file<<left<<setw(11)<<employee[i].id<<" ";
+        file<<setw(20)<<employee[i].name;
+        for(int j = 1; j<=4; j++)
+        {
+            file<<right<<setw(20)<<fixed<<setprecision(2)<<salary[i][j];
+        }
+        file<<endl;
+    }
+
+
+}
+
+void payroll(int lastIndex, Employee employee[]){
+
+
 
 }
 
@@ -136,6 +170,9 @@ int main(){
         //TODO: add try catch
         cout<<"Choose what you want to do\n";
         cin>>userInput;
+
+
+
 
         //print employee data
         if(userInput == 1)
@@ -158,10 +195,11 @@ int main(){
         {
             removeEmployee(employees, lastIndex);
         }
-        //calculate gross pay and output to payroll
+        // Calculate monthly salary for each employee
         else if(userInput == 4)
         {
-
+            double salary[MAX_EMPLOYEE][5];
+            calculateMonthlySalary(employees, salary, lastIndex);
         }
         //exit
         else if(userInput == -1)
