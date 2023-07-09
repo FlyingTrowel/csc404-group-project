@@ -33,10 +33,91 @@ struct Employee{
     double deduction;
 };
 const int MAX_EMPLOYEE = 100;
+string employeetxt = "D:\\Github\\Learn\\404\\csc404-group-project\\files\\employee.txt";
+string payrolltxt = "D:\\Github\\Learn\\404\\csc404-group-project\\files\\payroll.txt";
+
+//function prototypes
+int readEmployeeData(Employee[]);
+void printEmployeeData(const Employee[], int);
+void addEmployee(Employee&, int*);
+void addEmployeeToFile(const Employee[], int);
+void removeEmployee(Employee[], int&);
+void editEmployee(Employee[], int);
+void calculateMonthlySalary(const Employee[], double[][5], int);
+
+
+int main() {
+    Employee employees[MAX_EMPLOYEE];
+    int lastIndex = -1;
+    int userInput = 0;
+
+    lastIndex = readEmployeeData(employees);
+
+    while (userInput != -1) {
+        try {
+            cout << "\nChoose an option:\n";
+            cout << "1. Print employee data\n";
+            cout << "2. Insert new employee details\n";
+            cout << "3. Remove an employee\n";
+            cout << "4. Edit an employee\n";
+            cout << "5. Calculate monthly salary for each employee\n";
+            cout << "-1. Exit\n";
+            cout << "Enter your choice: ";
+
+            if (!(cin >> userInput)) {
+                throw runtime_error("Invalid input. Please enter a number.");
+            }
+
+            switch (userInput) {
+                case 1:
+                    printEmployeeData(employees, lastIndex);
+                    break;
+                case 2: {
+                    Employee *addEmp = &employees[lastIndex];
+                    addEmployee(*addEmp, &lastIndex);
+                    cout << "New employee added:\n";
+                    printEmployeeData(employees, lastIndex);
+                    addEmployeeToFile(employees, lastIndex);
+                }
+                    break;
+                case 3:
+                    removeEmployee(employees, lastIndex);
+                    break;
+                case 4:
+                    editEmployee(employees, lastIndex);
+                    break;
+                case 5: {
+                    double salary[MAX_EMPLOYEE][5];
+                    calculateMonthlySalary(employees, salary, lastIndex);
+                    cout << "Monthly salary calculated and stored in payroll.txt.\n";
+                }
+                    break;
+                case -1:
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid option.\n";
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    continue;
+            }
+
+            if (userInput != -1) {
+                cout << "Operation completed.\n";
+            }
+        } catch (const exception &e) {
+            cout << "Error: " << e.what() << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+
+    cout << "System is shutting down...\n";
+    return 0;
+}
 
 int readEmployeeData(Employee employee[])
 {
-    ifstream file("D:\\Github\\Learn\\404\\csc404-group-project\\files\\employee.txt");
+    ifstream file(employeetxt);
     if(!file){
         cerr<<"Error opening the file: ";
         return -1;
@@ -74,7 +155,8 @@ int readEmployeeData(Employee employee[])
     return index;
 }
 
-void printEmployeeData(Employee employee[], int lastIndex) {
+void printEmployeeData(const Employee employee[], int lastIndex) {
+    cout<<endl;
     cout << "-----------------------------------------------------------------------------------------------------" << endl;
     cout << left << setw(6) << "ID" << " | " << setw(20) << "Name" << " | " << setw(12) << "Designation" <<" | "<< setw(11) << "Hourly Rate" << " | " << setw(13) << "Hours Worked" << " | " << setw(10) << "Allowance" << " | " << setw(9) << "Deduction" << endl;
     cout << "-----------------------------------------------------------------------------------------------------" << endl;
@@ -91,7 +173,6 @@ void printEmployeeData(Employee employee[], int lastIndex) {
 
     cout << "-----------------------------------------------------------------------------------------------------" << endl;
 }
-
 
 void addEmployee(Employee& employee, int* lastIndex) {
     bool validInput = false;
@@ -155,9 +236,9 @@ void addEmployee(Employee& employee, int* lastIndex) {
     *lastIndex += 1;
 }
 
-void addEmployeeToFile(Employee employee[], int lastIndex)
+void addEmployeeToFile(const Employee employee[], int lastIndex)
 {
-    ofstream file("D:\\Github\\Learn\\404\\csc404-group-project\\files\\employee.txt");
+    ofstream file(employeetxt);
 
     for(int i = 0; i< lastIndex; i++)
     {
@@ -289,8 +370,8 @@ void editEmployee(Employee employee[], int lastIndex) {
     }
 }
 
-void calculateMonthlySalary(Employee employee[], double salary[][5], int lastIndex) {
-    ofstream file("D:\\Github\\Learn\\404\\csc404-group-project\\files\\payroll.txt");
+void calculateMonthlySalary(const Employee employee[], double salary[][5], int lastIndex) {
+    ofstream file(payrolltxt);
 
     for (int i = 0; i < lastIndex; i++) {
         double regularPay = employee[i].hourlyRate * employee[i].hoursWorked;
@@ -317,74 +398,20 @@ void calculateMonthlySalary(Employee employee[], double salary[][5], int lastInd
         file<<endl;
     }
 
-
-}
-
-
-int main(){
-    //declare employee struct variable
-    Employee employees[MAX_EMPLOYEE];
-
-    int lastIndex = -1;
-    int userInput = 0;
-
-    //store data from employee.txt to employees array
-    lastIndex = readEmployeeData(employees);
-
-    while(userInput != -1){
-        //TODO: add try catch
-        cout<<"Choose what you want to do\n";
-        cin>>userInput;
-
-
-
-
-        //print employee data
-        if(userInput == 1)
+    cout<<"Monthly Salary"<<endl;
+    cout<<left<<setw(11)<<"Employee ID "<<setw(20)<<"Name"<<right<<setw(20)<<"Regular Pay "<<setw(20)<<"Overtime Pay "<<setw(20)<<"Total Pay "<<setw(20)<<"Average Pay Rate"<< endl;
+    for(int i = 0; i<lastIndex; i++)
+    {
+        cout<<left<<setw(11)<<employee[i].id<<" ";
+        cout<<setw(20)<<employee[i].name;
+        for(int j = 1; j<=4; j++)
         {
-            //display all the employee data
-            printEmployeeData(employees, lastIndex);
+            cout<<right<<setw(20)<<fixed<<setprecision(2)<<salary[i][j];
         }
-        //insert new employee details and update the file
-        else if(userInput == 2)
-        {
-            //add an employee
-            Employee* addEmp = &employees[lastIndex];
-            addEmployee(*addEmp, &lastIndex);
-            cout<<lastIndex;
-            printEmployeeData(employees, lastIndex);
-            addEmployeeToFile(employees, lastIndex);
-        }
-        //remove employee
-        else if(userInput == 3)
-        {
-            removeEmployee(employees, lastIndex);
-        }
-        //edit employee
-        else if(userInput == 4)
-        {
-            editEmployee(employees, lastIndex);
-        }
-        // Calculate monthly salary for each employee
-        else if(userInput == 5)
-        {
-            double salary[MAX_EMPLOYEE][5];
-            calculateMonthlySalary(employees, salary, lastIndex);
-        }
-        //exit
-        else if(userInput == -1)
-        {
-            break;
-        }
-        //wrong input number
-        else
-        {
-            cout<<"Invalid input: "<<userInput;
-        }
-
-
+        cout<<endl;
     }
 
-    cout<<"System is shutting down...";
-    return 0;
+
 }
+
+
