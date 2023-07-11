@@ -18,6 +18,8 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include <stdexcept>
+
 
 using namespace std;
 
