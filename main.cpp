@@ -34,6 +34,7 @@ struct Employee{
     double allowance;
     double deduction;
 };
+
 const int MAX_EMPLOYEE = 100;
 string employeetxt = "D:\\Github\\Learn\\404\\csc404-group-project\\files\\employee.txt";
 string payrolltxt = "D:\\Github\\Learn\\404\\csc404-group-project\\files\\payroll.txt";
@@ -41,7 +42,8 @@ string payrolltxt = "D:\\Github\\Learn\\404\\csc404-group-project\\files\\payrol
 //function prototypes
 int readEmployeeData(Employee[]);
 void printEmployeeData(const Employee[], int);
-void addEmployee(Employee&, int*);
+void addEmployee(Employee&, int*, const Employee[]);
+void sortEmployeesById(Employee[], int);
 void addEmployeeToFile(const Employee[], int);
 void removeEmployee(Employee[], int&);
 void editEmployee(Employee[], int);
@@ -76,7 +78,9 @@ int main() {
                     break;
                 case 2: {
                     Employee *addEmp = &employees[lastIndex];
-                    addEmployee(*addEmp, &lastIndex);
+                    //addEmployee(*addEmp, &lastIndex, employees);
+                    addEmployee(*addEmp, &lastIndex, employees);
+                    sortEmployeesById(employees, lastIndex);
                     cout << "New employee added:\n";
                     printEmployeeData(employees, lastIndex);
                     addEmployeeToFile(employees, lastIndex);
@@ -176,7 +180,7 @@ void printEmployeeData(const Employee employee[], int lastIndex) {
     cout << "-----------------------------------------------------------------------------------------------------" << endl;
 }
 
-void addEmployee(Employee& employee, int* lastIndex) {
+void addEmployee(Employee& employee, int* lastIndex, const Employee employees[]) {
     bool validInput = false;
 
     while (!validInput) {
@@ -187,6 +191,19 @@ void addEmployee(Employee& employee, int* lastIndex) {
             cin >> employee.id;
             if (!cin) {
                 throw runtime_error("Invalid input. ID must be an integer.");
+            }
+
+            //non negative ID
+            if(employee.id<=0)
+            {
+                throw runtime_error("Invalid input. Employee ID must be in positive integer range");
+            }
+
+            //unique employee ID
+            for(int i = 0; i<*lastIndex; i++)
+            {
+                if(employee.id == employees[i].id)
+                    throw runtime_error("Invalid input. Employee ID must be unique");
             }
 
             cin.ignore();  // Ignore the newline character left in the input buffer
@@ -203,10 +220,18 @@ void addEmployee(Employee& employee, int* lastIndex) {
                 throw runtime_error("Invalid input. Hourly rate must be a number.");
             }
 
+            if(employee.hourlyRate<0){
+                throw runtime_error("Invalid input. Hourly rate cannot be negative");
+            }
+
             cout << "Hours Worked: ";
             cin >> employee.hoursWorked;
             if (!cin) {
                 throw runtime_error("Invalid input. Hours worked must be an integer.");
+            }
+
+            if(employee.hoursWorked<0){
+                throw runtime_error("Invalid input. Hours worked cannot be negative");
             }
 
             cout << "Overtime Hours: ";
@@ -215,10 +240,18 @@ void addEmployee(Employee& employee, int* lastIndex) {
                 throw runtime_error("Invalid input. Overtime hours must be an integer.");
             }
 
+            if(employee.overtimeHours<0){
+                throw runtime_error("Invalid input. Overtime hours cannot be negative");
+            }
+
             cout << "Allowance: ";
             cin >> employee.allowance;
             if (!cin) {
                 throw runtime_error("Invalid input. Allowance must be a number.");
+            }
+
+            if(employee.allowance<0){
+                throw runtime_error("Invalid input. Allowance cannot be negative");
             }
 
             cout << "Deduction: ";
@@ -227,15 +260,32 @@ void addEmployee(Employee& employee, int* lastIndex) {
                 throw runtime_error("Invalid input. Deduction must be a number.");
             }
 
+            if(employee.deduction<0){
+                throw runtime_error("Invalid input. Deduction cannot be negative");
+            }
+
             validInput = true;
         } catch (const runtime_error& e) {
-            cout << "Error: " << e.what() << endl;
+            cout << "Error: " << e.what() << endl<<endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
     }
 
     *lastIndex += 1;
+}
+
+void sortEmployeesById(Employee employee[], int lastIndex) {
+    for (int i = 0; i < lastIndex - 1; i++) {
+        for (int j = 0; j < lastIndex - i - 1; j++) {
+            if (employee[j].id > employee[j + 1].id) {
+                // Swap employees
+                Employee temp = employee[j];
+                employee[j] = employee[j + 1];
+                employee[j + 1] = temp;
+            }
+        }
+    }
 }
 
 void addEmployeeToFile(const Employee employee[], int lastIndex)
@@ -263,22 +313,39 @@ void removeEmployee(Employee employee[], int& lastIndex) {
 
     // Prompt for employee ID to remove
     int idToRemove;
-    cout << "Enter the ID of the employee to remove: ";
-    cin >> idToRemove;
-
+    bool validInput = false;
     bool employeeFound = false;
 
-    // Find the employee with the matching ID
-    for (int i = 0; i < lastIndex; i++) {
-        if (employee[i].id == idToRemove) {
-            // Shift elements to remove the employee
-            for (int j = i; j < lastIndex - 1; j++) {
-                employee[j] = employee[j + 1];
+    while(!validInput)
+    {
+        try {
+            cout << "Enter the ID of the employee to remove: ";
+            cin >> idToRemove;
+
+            if (!cin || idToRemove <= 0) {
+                throw runtime_error("Invalid ID");
             }
 
-            lastIndex--;
-            employeeFound = true;
-            break;
+            validInput = true;
+
+            // Find the employee with the matching ID
+            for (int i = 0; i < lastIndex; i++) {
+                if (employee[i].id == idToRemove) {
+                    // Shift elements to remove the employee
+                    for (int j = i; j < lastIndex - 1; j++) {
+                        employee[j] = employee[j + 1];
+                    }
+
+                    lastIndex--;
+                    employeeFound = true;
+                    break;
+                }
+            }
+        }
+        catch (const runtime_error &e) {
+            cout << "Error: " << e.what() << endl << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
     }
 
@@ -298,8 +365,28 @@ void editEmployee(Employee employee[], int lastIndex) {
 
     // Prompt for employee ID to edit
     int idToEdit;
-    cout << "Enter the ID of the employee to edit: ";
-    cin >> idToEdit;
+    bool validInput = false;
+
+    while(!validInput){
+        cout << "Enter the ID of the employee to edit: ";
+        try{
+            cin >> idToEdit;
+
+            if(!cin || idToEdit <= 0)
+                throw runtime_error("Invalid ID");
+
+            validInput = true;
+        }
+        catch (const runtime_error& e){
+            cout << "Error: " << e.what() << endl << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+    }
+
+    validInput = false;
+
 
     bool employeeFound = false;
     int fieldToEdit;
@@ -308,6 +395,7 @@ void editEmployee(Employee employee[], int lastIndex) {
     for (int i = 0; i < lastIndex; i++) {
         if (employee[i].id == idToEdit) {
             employeeFound = true;
+
 
             // Prompt for the field to edit
             cout << "Select the field to edit:" << endl;
@@ -318,49 +406,119 @@ void editEmployee(Employee employee[], int lastIndex) {
             cout << "5. Overtime Hours" << endl;
             cout << "6. Allowance" << endl;
             cout << "7. Deduction" << endl;
-            cout << "Enter your choice: ";
-            cin >> fieldToEdit;
 
-            // Edit the chosen field
-            switch (fieldToEdit) {
-                case 1:
-                    cin.ignore();
-                    cout << "Enter the new name: ";
-                    getline(cin, employee[i].name);
-                    break;
-                case 2:
-                    cin.ignore();
-                    cout << "Enter the new designation: ";
-                    getline(cin, employee[i].designation);
-                    break;
-                case 3:
-                    cout << "Enter the new hourly rate: ";
-                    cin >> employee[i].hourlyRate;
-                    break;
-                case 4:
-                    cout << "Enter the new hours worked: ";
-                    cin >> employee[i].hoursWorked;
-                    break;
-                case 5:
-                    cout << "Enter the new overtime hours: ";
-                    cin >> employee[i].overtimeHours;
-                    break;
-                case 6:
-                    cout << "Enter the new allowance: ";
-                    cin >> employee[i].allowance;
-                    break;
-                case 7:
-                    cout << "Enter the new deduction: ";
-                    cin >> employee[i].deduction;
-                    break;
-                default:
-                    cout << "Invalid choice. No field updated." << endl;
-                    break;
+                while(!validInput) {
+                    cout << "Enter your choice: ";
+
+                    try {
+                        cin >> fieldToEdit;
+
+                        if (!cin) {
+                            throw runtime_error("Please input a number based on the choice above!");
+                        }
+
+                        // Edit the chosen field
+                        while (!validInput) {
+                            switch (fieldToEdit) {
+                                case 1:
+                                    cin.ignore();
+                                    cout << "Enter the new name: ";
+                                    getline(cin, employee[i].name);
+                                    validInput = true;
+                                    break;
+                                case 2:
+                                    cin.ignore();
+                                    cout << "Enter the new designation: ";
+                                    getline(cin, employee[i].designation);
+                                    validInput = true;
+                                    break;
+                                case 3:
+                                    cout << "Enter the new hourly rate: ";
+                                    try {
+                                        cin >> employee[i].hourlyRate;
+                                        if (!cin || employee[i].hourlyRate < 0)
+                                            throw runtime_error("Please input a valid number");
+                                        validInput = true;
+                                        break;
+                                    }
+                                    catch (const runtime_error &e) {
+                                        cout << "Error: " << e.what() << endl << endl;
+                                        cin.clear();
+                                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                    }
+                                case 4:
+                                    cout << "Enter the new hours worked: ";
+                                    try {
+                                        cin >> employee[i].hoursWorked;
+                                        if (!cin || employee[i].hoursWorked < 0)
+                                            throw runtime_error("Please input a valid integer");
+                                        validInput = true;
+                                        break;
+                                    }
+                                    catch (const runtime_error &e) {
+                                        cout << "Error: " << e.what() << endl << endl;
+                                        cin.clear();
+                                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                    }
+                                case 5:
+                                    cout << "Enter the new overtime hours: ";
+                                    try {
+                                        cin >> employee[i].overtimeHours;
+                                        if (!cin || employee[i].overtimeHours < 0)
+                                            throw runtime_error("Please input a valid integer");
+                                        validInput = true;
+                                        break;
+                                    }
+                                    catch (const runtime_error &e) {
+                                        cout << "Error: " << e.what() << endl << endl;
+                                        cin.clear();
+                                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                    }
+                                case 6:
+                                    cout << "Enter the new allowance: ";
+                                    try {
+                                        cin >> employee[i].allowance;
+                                        if (!cin || employee[i].allowance < 0)
+                                            throw runtime_error("Please input a valid number");
+                                        validInput = true;
+                                        break;
+                                    }
+                                    catch (const runtime_error &e) {
+                                        cout << "Error: " << e.what() << endl << endl;
+                                        cin.clear();
+                                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                    }
+                                case 7:
+                                    cout << "Enter the new deduction: ";
+                                    try {
+                                        cin >> employee[i].deduction;
+                                        if (!cin || employee[i].deduction < 0)
+                                            throw runtime_error("Please input a valid number");
+                                        validInput = true;
+                                        break;
+                                    }
+                                    catch (const runtime_error &e) {
+                                        cout << "Error: " << e.what() << endl << endl;
+                                        cin.clear();
+                                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                    }
+                                default:
+                                    cout << "Invalid choice. No field updated." << endl;
+                                    return;
+                                    break;
+                            }
+                        }
+                    }
+                    catch (const runtime_error &e) {
+                        cout << "Error: " << e.what() << endl << endl;
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    }
+                }
+                break;
             }
-
-            break;
         }
-    }
+
 
     // Check if employee was found and edited
     if (employeeFound) {
