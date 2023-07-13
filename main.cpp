@@ -1,14 +1,15 @@
 /**
- * c++11 minimum
+ * MINIMUM REQUIREMENT: C++11
+ *
  * TODO: 1. Applying \pointers concepts
  * TODO: 2. Applying \function concepts
  * TODO: 3. Applying file \i \o concepts
  * TODO: 4. Applying \1-d and \2-d array concepts
  * TODO: 5. Applying \text files concepts
  * TODO: 6. Integrating \pointers, \function, \arrays and \text files in the system
- * TODO: 7. Interactivity
+ * TODO: 7. \Interactivity
  * TODO: 8. \Calculation
- * TODO: 9. Exception handling
+ * TODO: 9. \Exception handling
  *
  * TODO: https://stackoverflow.com/questions/49775560/how-to-create-standalone-exe-in-clion
  */
